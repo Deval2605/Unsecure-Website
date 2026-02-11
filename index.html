@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Amazon</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="cart.html">Cart (<span id="cartCount">0</span>)</a>
+                <a href="login.html" id="loginLink">Login</a>
+                <!-- VULNERABILITY: Admin panel link hidden but page accessible via direct URL -->
+                <!-- <a href="admin_panel.html" id="adminLink" style="display:none;">Admin</a> -->
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2>Featured Products</h2>
+        <div class="products-grid" id="productsGrid">
+            <!-- Products will be loaded here -->
+        </div>
+
+        <div class="user-info-section">
+            <h3>My Account Info</h3>
+            <button onclick="showMyInfo()">View My Details</button>
+            <div id="userInfoDisplay"></div>
+        </div>
+
+        <div class="orders-section">
+            <h3>My Orders</h3>
+            <p>View your recent orders and download receipts</p>
+            <div id="ordersDisplay"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Amazon. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        // Initialize products on page load
+        window.onload = function() {
+            loadProducts();
+            updateCartCount();
+            checkLoginStatus();
+            loadUserOrders();
+        };
+
+        function loadProducts() {
+            const products = getProducts();
+            const grid = document.getElementById('productsGrid');
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">${product.name.charAt(0)}</div>
+                    <h3>${product.name}</h3>
+                    <p class="price">$${product.price}</p>
+                    <button onclick="addToCart(${product.id})">Add to Cart</button>
+                `;
+                grid.appendChild(productCard);
+            });
+        }
+
+        function addToCart(productId) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const products = getProducts();
+            const product = products.find(p => p.id === productId);
+            
+            cart.push(product);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            alert('Added to cart!');
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            document.getElementById('cartCount').textContent = cart.length;
+        }
+
+        function checkLoginStatus() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser) {
+                document.getElementById('loginLink').textContent = `Hello, ${currentUser.username}`;
+                
+                // VULNERABILITY: Admin link shown client-side only
+                if (currentUser.role === 'admin') {
+                    // Uncomment to show admin link properly (still needs server-side check)
+                    // document.getElementById('adminLink').style.display = 'inline';
+                }
+            }
+        }
+
+        // VULNERABILITY 1: Insecure Direct Object Reference (IDOR)
+        // This function is accessible from browser console
+        function fetchUserData(userId) {
+            console.log(`Fetching data for user ID: ${userId}`);
+            
+            /* SECURITY FIX: Uncomment to prevent IDOR
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!currentUser) {
+                console.error('Not authenticated');
+                return;
+            }
+            if (currentUser.id !== userId && currentUser.role !== 'admin') {
+                console.error('Unauthorized: Cannot access other users data');
+                return;
+            }
+            */
+            
+            const users = getUsers();
+            const user = users.find(u => u.id === userId);
+            
+            if (user) {
+                console.log('User Data:', {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    address: user.address,
+                    creditCard: user.creditCard,
+                    orders: user.orders
+                });
+                return user;
+            } else {
+                console.log('User not found');
+            }
+        }
+
+        function showMyInfo() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            const display = document.getElementById('userInfoDisplay');
+            
+            if (!currentUser) {
+                display.innerHTML = '<p class="error">Please login first</p>';
+                return;
+            }
+            
+            // VULNERABILITY: Using client-side user ID
+            const userData = fetchUserData(currentUser.id);
+            
+            if (userData) {
+                display.innerHTML = `
+                    <div class="user-details">
+                        <p><strong>Username:</strong> ${userData.username}</p>
+                        <p><strong>Email:</strong> ${userData.email}</p>
+                        <p><strong>Address:</strong> ${userData.address}</p>
+                        <p><strong>Credit Card:</strong> ${userData.creditCard}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // VULNERABILITY 3: Path Traversal
+        // Realistic implementation: Users click to view their receipts
+        // But the function doesn't validate the file path properly
+        function viewReceipt(receiptId) {
+            console.log(`Fetching receipt: ${receiptId}`);
+            
+            /* SECURITY FIX: Uncomment to prevent path traversal
+            // Validate receipt ID - only allow alphanumeric and underscore
+            const allowedPattern = /^receipt_\d+$/;
+            if (!allowedPattern.test(receiptId)) {
+                showReceiptContent('Invalid receipt ID. Access denied.');
+                return;
+            }
+            
+            // Additionally, ensure the path doesn't contain directory traversal
+            if (receiptId.includes('..') || receiptId.includes('/')) {
+                showReceiptContent('Invalid receipt ID format.');
+                return;
+            }
+            */
+            
+            // VULNERABILITY: Directly using user input to construct file path
+            const filePath = `orders/${receiptId}.txt`;
+            const fileContent = simulateFileRead(filePath);
+            showReceiptContent(fileContent);
+        }
+
+        // Alternative attack vector - advanced users can call this directly
+        function viewFile(filePath) {
+            console.log(`Accessing file: ${filePath}`);
+            
+            /* SECURITY FIX: Uncomment to prevent path traversal
+            if (filePath.includes('..') || filePath.includes('/etc/') || filePath.includes('config')) {
+                showReceiptContent('Invalid file path. Access denied.');
+                return;
+            }
+            
+            const allowedPattern = /^orders\/receipt_\d+\.txt$/;
+            if (!allowedPattern.test(filePath)) {
+                showReceiptContent('Invalid file format. Only order receipts allowed.');
+                return;
+            }
+            */
+            
+            const fileContent = simulateFileRead(filePath);
+            showReceiptContent(fileContent);
+        }
+
+        function showReceiptContent(content) {
+            const modal = document.createElement('div');
+            modal.className = 'receipt-modal';
+            modal.innerHTML = `
+                <div class="receipt-content">
+                    <button class="close-btn" onclick="this.parentElement.parentElement.remove()">Close</button>
+                    <pre class="file-display">${content}</pre>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function loadUserOrders() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            const ordersDisplay = document.getElementById('ordersDisplay');
+            
+            if (!currentUser) {
+                ordersDisplay.innerHTML = '<p class="info-message">Please login to view your orders</p>';
+                return;
+            }
+            
+            const users = getUsers();
+            const user = users.find(u => u.id === currentUser.id);
+            
+            if (!user || !user.orders || user.orders.length === 0) {
+                ordersDisplay.innerHTML = '<p class="info-message">You have no orders yet</p>';
+                return;
+            }
+            
+            ordersDisplay.innerHTML = '';
+            user.orders.forEach(order => {
+                const orderDiv = document.createElement('div');
+                orderDiv.className = 'order-card';
+                orderDiv.innerHTML = `
+                    <div class="order-info">
+                        <h4>Order #${order.id}</h4>
+                        <p>Date: ${order.date}</p>
+                        <p class="price">Total: $${order.total}</p>
+                    </div>
+                    <button onclick="viewReceipt('receipt_${order.id.replace('ORD', '')}')">View Receipt</button>
+                `;
+                ordersDisplay.appendChild(orderDiv);
+            });
+        }
+
+        // Simulate file system
+        function simulateFileRead(path) {
+            const fileSystem = {
+                'orders/receipt_001.txt': 'ORDER RECEIPT #001\n\nDate: 2024-01-15\nCustomer: Dev\nOrder ID: ORD001\n\nItems:\n- Laptop x1: $999.99\n- Mouse x1: $29.99\n\nSubtotal: $1,029.98\nTax: $92.70\nTotal: $89.99\n\nThank you for shopping with Amazon!',
+                'orders/receipt_002.txt': 'ORDER RECEIPT #002\n\nDate: 2024-01-20\nCustomer: Dev\nOrder ID: ORD002\n\nItems:\n- Keyboard x1: $79.99\n\nSubtotal: $79.99\nTax: $7.20\nTotal: $45.00\n\nThank you for shopping with Amazon!',
+                'orders/receipt_003.txt': 'ORDER RECEIPT #003\n\nDate: 2024-01-18\nCustomer: Dev*\nOrder ID: ORD003\n\nItems:\n- Monitor x1: $299.99\n- Headphones x1: $149.99\n\nSubtotal: $449.98\nTax: $40.50\nTotal: $120.50\n\nThank you for shopping with Amazon!',
+                
+                // Path traversal targets - these should NOT be accessible
+                'orders/../config/database.txt': 'DATABASE CONFIGURATION FILE\n================================\n\nProduction Database:\nHost: db.Amazon.com\nPort: 5432\nDatabase: Amazon_prod\nUsername: db_admin\nPassword: SecureP@ss2024!\n\nBackup Database:\nHost: db-backup.Amazon.com\nPort: 5432\nUsername: backup_user\nPassword: Backup123\n\nConnection String:\npostgresql://db_admin:SecureP@ss2024!@db.Amazon.com:5432/Amazon_prod',
+                
+                'orders/../config/api_keys.txt': 'API KEYS AND SECRETS\n====================\n\nStripe Payment Gateway:\nPublishable Key: Demo_key_abcd1234\nSecret Key: Demo_key_abcd1234\n\nAWS Credentials:\nAccess Key ID: Demo_key_abcd1234\nSecret Access Key: Demo_key_abcd1234\n\nSendGrid Email:\nAPI Key: Demo_key_abcd1234\n\nGoogle OAuth:\nClient ID: 123456789-abcdefghijklmnop.apps.googleusercontent.com\nClient Secret: Demo_key_abcd1234',
+                
+                'orders/../../etc/passwd': 'root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nsys:x:3:3:sys:/dev:/usr/sbin/nologin\nadmin:x:1000:1000:Admin User:/home/admin:/bin/bash\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\nAmazon:x:1001:1001:Amazon App:/home/l:/bin/bash',
+            };
+            
+            return fileSystem[path] || 'Error: File not found\n\nThe requested file could not be located.';
+        }
+    </script>
+</body>
+</html>

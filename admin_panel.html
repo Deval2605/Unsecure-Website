@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Amazon - Admin Panel</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="admin_panel.html">Admin</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="adminContent">
+            <h2>Administrator Dashboard</h2>
+            
+            <div class="admin-section">
+                <h3>All Users</h3>
+                <div id="usersList"></div>
+            </div>
+
+            <div class="admin-section">
+                <h3>All Orders</h3>
+                <div id="ordersList"></div>
+            </div>
+
+            <div class="admin-section">
+                <h3>System Settings</h3>
+                <div class="settings-box">
+                    <p>Database Connection: Active</p>
+                    <p>API Status: Running</p>
+                    <p>Admin Users: 1</p>
+                    <p>Total Users: 3</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="accessDenied" style="display:none;">
+            <h2>Access Denied</h2>
+            <p>You do not have permission to view this page.</p>
+            <a href="login.html">Please login as admin</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Amazon. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        // VULNERABILITY 2: Broken Access Control
+        // This page is accessible via direct URL without proper authentication
+        // Only client-side check is performed
+        
+        window.onload = function() {
+            /* SECURITY FIX: This client-side check is insufficient
+               In a real application, this should be a SERVER-SIDE check
+               The page should not even load without proper authentication
+               
+               Uncomment the following to add basic client-side protection
+               (Note: This is still not secure - server-side validation is required)
+            */
+            
+            /*
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            
+            if (!currentUser || currentUser.role !== 'admin') {
+                document.getElementById('adminContent').style.display = 'none';
+                document.getElementById('accessDenied').style.display = 'block';
+                return;
+            }
+            */
+            
+            // VULNERABILITY: Admin panel loads for anyone who knows the URL
+            loadAdminData();
+        };
+
+        function loadAdminData() {
+            // Load all users
+            const users = getUsers();
+            const usersList = document.getElementById('usersList');
+            
+            users.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user-card';
+                userDiv.innerHTML = `
+                    <p><strong>ID:</strong> ${user.id}</p>
+                    <p><strong>Username:</strong> ${user.username}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Role:</strong> ${user.role}</p>
+                    <p><strong>Credit Card:</strong> ${user.creditCard}</p>
+                    <p><strong>Address:</strong> ${user.address}</p>
+                `;
+                usersList.appendChild(userDiv);
+            });
+
+            // Load all orders
+            const ordersList = document.getElementById('ordersList');
+            users.forEach(user => {
+                if (user.orders && user.orders.length > 0) {
+                    user.orders.forEach(order => {
+                        const orderDiv = document.createElement('div');
+                        orderDiv.className = 'order-card';
+                        orderDiv.innerHTML = `
+                            <p><strong>Order ID:</strong> ${order.id}</p>
+                            <p><strong>User:</strong> ${user.username}</p>
+                            <p><strong>Total:</strong> $${order.total}</p>
+                            <p><strong>Date:</strong> ${order.date}</p>
+                        `;
+                        ordersList.appendChild(orderDiv);
+                    });
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+
+        /* PROPER SECURITY IMPLEMENTATION:
+        
+        In a real-world application, this page should:
+        
+        1. Be protected by SERVER-SIDE authentication:
+           - Check session/token on server before sending HTML
+           - Use HTTP-only cookies for session management
+           - Implement proper session timeout
+        
+        2. Use proper authorization:
+           - Verify user role on EVERY request to the server
+           - Never trust client-side role information
+           - Implement proper RBAC (Role-Based Access Control)
+        
+        3. Additional security measures:
+           - Use HTTPS only
+           - Implement CSRF protection
+           - Add rate limiting
+           - Log all admin actions
+           - Implement multi-factor authentication
+           - Use security headers (CSP, X-Frame-Options, etc.)
+        
+        The current implementation is INTENTIONALLY VULNERABLE for educational purposes.
+        NEVER deploy this in a production environment!
+        */
+    </script>
+</body>
+</html>

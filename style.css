@@ -1,0 +1,447 @@
+/* Amazon Styles - Simple, No Gradients, White/Black/Yellow Only */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: white;
+    color: black;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background-color: black;
+    color: white;
+    padding: 20px 0;
+    border-bottom: 5px solid yellow;
+}
+
+header h1 {
+    display: inline-block;
+    margin-right: 40px;
+}
+
+nav {
+    display: inline-block;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px;
+    padding: 10px 15px;
+    border: 2px solid yellow;
+    background-color: black;
+}
+
+nav a:hover {
+    background-color: yellow;
+    color: black;
+}
+
+/* Main Content */
+main {
+    min-height: 500px;
+    padding: 40px 0;
+}
+
+h2 {
+    margin-bottom: 30px;
+    border-bottom: 3px solid black;
+    padding-bottom: 10px;
+}
+
+h3 {
+    margin: 20px 0 10px 0;
+}
+
+/* Products Grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.product-card {
+    border: 3px solid black;
+    padding: 20px;
+    background-color: white;
+}
+
+.product-image {
+    width: 100%;
+    height: 150px;
+    background-color: yellow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    border: 2px solid black;
+}
+
+.product-card h3 {
+    margin: 10px 0;
+}
+
+.price {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.product-card button {
+    width: 100%;
+    padding: 12px;
+    background-color: yellow;
+    color: black;
+    border: 2px solid black;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.product-card button:hover {
+    background-color: black;
+    color: yellow;
+}
+
+/* Cart */
+.cart-item {
+    border: 2px solid black;
+    padding: 20px;
+    margin-bottom: 15px;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-item-info h3 {
+    margin: 0 0 10px 0;
+}
+
+.cart-item button {
+    padding: 10px 20px;
+    background-color: black;
+    color: white;
+    border: 2px solid black;
+    cursor: pointer;
+}
+
+.cart-item button:hover {
+    background-color: yellow;
+    color: black;
+}
+
+.cart-summary {
+    margin-top: 30px;
+    padding: 20px;
+    border: 3px solid black;
+    background-color: yellow;
+}
+
+.cart-summary h3 {
+    margin: 0 0 20px 0;
+    font-size: 24px;
+}
+
+.cart-summary button {
+    padding: 15px 30px;
+    margin-right: 10px;
+    background-color: black;
+    color: white;
+    border: 2px solid black;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.cart-summary button:hover {
+    background-color: white;
+    color: black;
+}
+
+.clear-btn {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid black !important;
+}
+
+.clear-btn:hover {
+    background-color: black !important;
+    color: white !important;
+}
+
+/* Login Form */
+.login-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 40px;
+    border: 3px solid black;
+    background-color: white;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid black;
+    font-size: 16px;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 15px;
+    background-color: yellow;
+    color: black;
+    border: 3px solid black;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.login-container button:hover {
+    background-color: black;
+    color: yellow;
+}
+
+#loginMessage {
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.demo-credentials {
+    margin-top: 40px;
+    padding: 20px;
+    border: 2px solid black;
+    background-color: yellow;
+}
+
+.credentials-box {
+    background-color: white;
+    padding: 15px;
+    margin: 10px 0;
+    border: 2px solid black;
+}
+
+.credentials-box p {
+    margin: 5px 0;
+}
+
+/* Admin Panel */
+.admin-section {
+    margin-bottom: 40px;
+    padding: 20px;
+    border: 3px solid black;
+    background-color: white;
+}
+
+.user-card, .order-card {
+    padding: 15px;
+    margin: 10px 0;
+    border: 2px solid black;
+    background-color: yellow;
+}
+
+.user-card p, .order-card p {
+    margin: 5px 0;
+}
+
+.settings-box {
+    padding: 20px;
+    border: 2px solid black;
+    background-color: yellow;
+}
+
+.settings-box p {
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+#accessDenied {
+    text-align: center;
+    padding: 60px 20px;
+    border: 3px solid black;
+}
+
+#accessDenied h2 {
+    color: black;
+    margin-bottom: 20px;
+}
+
+#accessDenied a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 15px 30px;
+    background-color: yellow;
+    color: black;
+    text-decoration: none;
+    border: 2px solid black;
+    font-weight: bold;
+}
+
+/* User Info Section */
+.user-info-section, .orders-section {
+    margin: 40px 0;
+    padding: 20px;
+    border: 3px solid black;
+    background-color: white;
+}
+
+.user-info-section button, .orders-section button {
+    padding: 12px 24px;
+    background-color: yellow;
+    color: black;
+    border: 2px solid black;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 10px 10px 10px 0;
+}
+
+.user-info-section button:hover, .orders-section button:hover {
+    background-color: black;
+    color: yellow;
+}
+
+.info-message {
+    padding: 15px;
+    background-color: yellow;
+    border: 2px solid black;
+    margin: 10px 0;
+}
+
+.order-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin: 15px 0;
+    border: 2px solid black;
+    background-color: yellow;
+}
+
+.order-info h4 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+}
+
+.order-info p {
+    margin: 5px 0;
+}
+
+.order-card button {
+    padding: 12px 24px;
+    margin: 0;
+}
+
+/* Receipt Modal */
+.receipt-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.receipt-content {
+    background-color: white;
+    border: 5px solid black;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80%;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    background-color: black;
+    color: white;
+    border: 2px solid black;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.close-btn:hover {
+    background-color: yellow;
+    color: black;
+}
+
+#userInfoDisplay, #fileContent {
+    margin-top: 20px;
+}
+
+.user-details {
+    padding: 20px;
+    background-color: yellow;
+    border: 2px solid black;
+}
+
+.user-details p {
+    margin: 10px 0;
+}
+
+.error {
+    color: black;
+    font-weight: bold;
+    padding: 15px;
+    border: 2px solid black;
+    background-color: yellow;
+}
+
+.file-display {
+    background-color: black;
+    color: yellow;
+    padding: 20px;
+    border: 2px solid black;
+    font-family: monospace;
+    white-space: pre-wrap;
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Footer */
+footer {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    border-top: 5px solid yellow;
+    margin-top: 60px;
+}

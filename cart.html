@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon - Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Amazon</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="cart.html">Cart</a>
+                <a href="login.html" id="loginLink">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2>Shopping Cart</h2>
+        <div id="cartItems"></div>
+        <div class="cart-summary">
+            <h3>Total: $<span id="cartTotal">0.00</span></h3>
+            <button onclick="checkout()">Checkout</button>
+            <button onclick="clearCart()" class="clear-btn">Clear Cart</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Amazon. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        window.onload = function() {
+            loadCart();
+            checkLoginStatus();
+        };
+
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cartItemsDiv = document.getElementById('cartItems');
+            const cartTotalSpan = document.getElementById('cartTotal');
+            
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p>Your cart is empty</p>';
+                cartTotalSpan.textContent = '0.00';
+                return;
+            }
+            
+            let total = 0;
+            cartItemsDiv.innerHTML = '';
+            
+            cart.forEach((item, index) => {
+                total += item.price;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.innerHTML = `
+                    <div class="cart-item-info">
+                        <h3>${item.name}</h3>
+                        <p class="price">$${item.price}</p>
+                    </div>
+                    <button onclick="removeFromCart(${index})">Remove</button>
+                `;
+                cartItemsDiv.appendChild(itemDiv);
+            });
+            
+            cartTotalSpan.textContent = total.toFixed(2);
+        }
+
+        function removeFromCart(index) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        function clearCart() {
+            localStorage.setItem('cart', '[]');
+            loadCart();
+        }
+
+        function checkout() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!currentUser) {
+                alert('Please login to checkout');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart.length === 0) {
+                alert('Your cart is empty');
+                return;
+            }
+            
+            alert('Order placed successfully! (Demo)');
+            clearCart();
+        }
+
+        function checkLoginStatus() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser) {
+                document.getElementById('loginLink').textContent = `Hello, ${currentUser.username}`;
+            }
+        }
+    </script>
+</body>
+</html>

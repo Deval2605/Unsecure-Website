@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Amazon</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="cart.html">Cart</a>
+                <a href="login.html">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="login-container">
+            <h2>Login</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">Login</button>
+                <p id="loginMessage"></p>
+            </form>
+
+          
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Amazon. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const message = document.getElementById('loginMessage');
+            
+            const users = getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                // Store current user in localStorage
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role
+                }));
+                
+                message.style.color = 'black';
+                message.textContent = 'Login successful! Redirecting...';
+                
+                setTimeout(() => {
+                    if (user.role === 'admin') {
+                        // VULNERABILITY: Redirect to admin panel without proper server-side validation
+                        window.location.href = 'admin_panel.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 1000);
+            } else {
+                message.style.color = 'black';
+                message.textContent = 'Invalid username or password';
+            }
+        }
+
+        // Check if already logged in
+        window.onload = function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser) {
+                document.getElementById('loginMessage').textContent = 
+                    `Already logged in as ${currentUser.username}`;
+            }
+        };
+    </script>
+</body>
+</html>
